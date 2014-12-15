@@ -16,6 +16,7 @@ import com.google.api.client.auth.oauth2.AuthorizationCodeFlow;
 import com.google.api.client.auth.oauth2.BearerToken;
 import com.google.api.client.auth.oauth2.ClientParametersAuthentication;
 import com.google.api.client.auth.oauth2.CredentialStore;
+import com.google.api.client.auth.oauth2.MemoryCredentialStore;
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson.JacksonFactory;
@@ -43,8 +44,7 @@ public class ProjectLockerOAuthAuthenticator extends OAuthAuthenticator {
                                            @Named("oauth.projectlocker.clientsecret") String clientSecret,
                                            @Named("oauth.projectlocker.redirecturis") String[] redirectUris,
                                            @Named("oauth.projectlocker.authuri") String authUri,
-                                           @Named("oauth.projectlocker.tokenuri") String tokenUri,
-                                           CredentialStore credentialStore) {
+                                           @Named("oauth.projectlocker.tokenuri") String tokenUri) {
         super(new AuthorizationCodeFlow.Builder(
                       BearerToken.authorizationHeaderAccessMethod(),
                       new NetHttpTransport(),
@@ -57,8 +57,8 @@ public class ProjectLockerOAuthAuthenticator extends OAuthAuthenticator {
                       authUri
               )
                       .setScopes(Collections.<String>emptyList())
-                      .setCredentialStore(credentialStore)
-                      .setCredentialStore(credentialStore).build(),
+                      .setCredentialStore(new MemoryCredentialStore())
+                      .build(),
               Arrays.asList(redirectUris)
              );
     }

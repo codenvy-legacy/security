@@ -16,6 +16,7 @@ import com.codenvy.commons.json.JsonParseException;
 import com.codenvy.commons.lang.IoUtil;
 import com.codenvy.security.oauth.shared.User;
 import com.google.api.client.auth.oauth2.CredentialStore;
+import com.google.api.client.auth.oauth2.MemoryCredentialStore;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.http.javanet.NetHttpTransport;
@@ -47,8 +48,7 @@ public class GoogleOAuthAuthenticator extends OAuthAuthenticator {
                                     @Named("oauth.google.clientsecret") String clientSecret,
                                     @Named("oauth.google.redirecturis") String[] redirectUris,
                                     @Nullable @Named("oauth.google.authuri") String authUri,
-                                    @Nullable @Named("oauth.google.tokenuri") String tokenUri,
-                                    CredentialStore credentialStore) {
+                                    @Nullable @Named("oauth.google.tokenuri") String tokenUri) {
         super(new GoogleAuthorizationCodeFlow.Builder(
                       new NetHttpTransport(),
                       new JacksonFactory(),
@@ -62,7 +62,7 @@ public class GoogleOAuthAuthenticator extends OAuthAuthenticator {
                                                       ),
                       Collections.<String>emptyList()
               )
-                      .setCredentialStore(credentialStore)
+                      .setCredentialStore(new MemoryCredentialStore())
                       .setApprovalPrompt("auto")
                       .setAccessType("online").build(),
               Arrays.asList(redirectUris)

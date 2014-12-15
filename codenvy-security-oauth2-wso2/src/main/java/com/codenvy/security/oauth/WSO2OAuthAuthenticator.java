@@ -19,6 +19,7 @@ import com.google.api.client.auth.oauth2.AuthorizationCodeFlow;
 import com.google.api.client.auth.oauth2.BearerToken;
 import com.google.api.client.auth.oauth2.ClientParametersAuthentication;
 import com.google.api.client.auth.oauth2.CredentialStore;
+import com.google.api.client.auth.oauth2.MemoryCredentialStore;
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson.JacksonFactory;
@@ -53,8 +54,7 @@ public class WSO2OAuthAuthenticator extends OAuthAuthenticator {
                                   @Named("oauth.wso2.redirecturis") String[] redirectUris,
                                   @Named("oauth.wso2.authuri") String authUri,
                                   @Named("oauth.wso2.tokenuri") String tokenUri,
-                                  @Named("oauth.wso2.useruri") String userUri,
-                                  CredentialStore credentialStore) {
+                                  @Named("oauth.wso2.useruri") String userUri) {
         super(new AuthorizationCodeFlow.Builder(
                       BearerToken.authorizationHeaderAccessMethod(),
                       new NetHttpTransport(),
@@ -67,8 +67,8 @@ public class WSO2OAuthAuthenticator extends OAuthAuthenticator {
                       authUri
               )
                       .setScopes(Arrays.asList(SCOPE))
-                      .setCredentialStore(credentialStore)
-                      .setCredentialStore(credentialStore).build(),
+                      .setCredentialStore(new MemoryCredentialStore())
+                      .build(),
               Arrays.asList(redirectUris));
         this.userUri = userUri;
     }
