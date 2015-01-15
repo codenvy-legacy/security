@@ -20,7 +20,7 @@
     </parent>
     <groupId>com.codenvy.security</groupId>
     <artifactId>codenvy-security-parent</artifactId>
-    <version>1.1.0</version>
+    <version>1.2.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Codenvy Security :: Parent</name>
     <modules>
@@ -34,7 +34,7 @@
     <scm>
         <connection>scm:git:git@github.com:codenvy/security.git</connection>
         <developerConnection>scm:git:git@github.com:codenvy/security.git</developerConnection>
-        <tag>1.1.0</tag>
+        <tag>HEAD</tag>
     </scm>
     <repositories>
         <repository>
