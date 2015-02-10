@@ -20,19 +20,18 @@ import com.google.api.client.auth.oauth2.AuthorizationCodeResponseUrl;
 import com.google.api.client.auth.oauth2.BearerToken;
 import com.google.api.client.auth.oauth2.ClientParametersAuthentication;
 import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.client.auth.oauth2.CredentialStore;
 import com.google.api.client.auth.oauth2.TokenResponse;
 import com.google.api.client.http.GenericUrl;
-import com.google.api.client.http.HttpParser;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.http.json.JsonHttpParser;
-import com.google.api.client.json.jackson.JacksonFactory;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.util.store.MemoryDataStoreFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -40,7 +39,6 @@ import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,7 +62,7 @@ public abstract class OAuthAuthenticator {
     }
 
     public OAuthAuthenticator(String clientId, String clientSecret, String[] redirectUris, String authUri, String tokenUri,
-                              CredentialStore credentialStore) {
+                              MemoryDataStoreFactory dataStoreFactory) throws IOException {
 
         this(new AuthorizationCodeFlow.Builder(
                      BearerToken.authorizationHeaderAccessMethod(),
@@ -77,20 +75,18 @@ public abstract class OAuthAuthenticator {
                      clientId,
                      authUri
              )
-                     .setScopes(Collections.<String>emptyList())
-                     .setCredentialStore(credentialStore)
-                     .setCredentialStore(credentialStore).build(),
+                     .setDataStoreFactory(dataStoreFactory).build(),
              Arrays.asList(redirectUris)
             );
 
 
-        LOG.debug("clientId={}, clientSecret={}, redirectUris={} , authUri={}, tokenUri={}, credentialStore={}",
+        LOG.debug("clientId={}, clientSecret={}, redirectUris={} , authUri={}, tokenUri={}, dataStoreFactory={}",
                   clientId,
                   clientSecret,
                   redirectUris,
                   authUri,
                   tokenUri,
-                  credentialStore);
+                  dataStoreFactory);
     }
 
 
@@ -167,14 +163,13 @@ public abstract class OAuthAuthenticator {
         }
 
         try {
-            final HttpParser parser = getParser();
             TokenResponse tokenResponse = flow.newTokenRequest(code).setRequestInitializer(new HttpRequestInitializer() {
                 @Override
                 public void initialize(HttpRequest request) throws IOException {
-                    if (request.getParser(parser.getContentType()) == null) {
-                        request.addParser(parser);
+                    if (request.getParser() == null) {
+                        request.setParser(flow.getJsonFactory().createJsonObjectParser());
                     }
-                    request.getHeaders().setAccept(parser.getContentType());
+                    request.getHeaders().setAccept(MediaType.APPLICATION_JSON);
                 }
             }).setRedirectUri(findRedirectUrl(requestUrl)).setScopes(scopes).execute();
             String userId = getUserFromUrl(authorizationCodeResponseUrl);
@@ -222,15 +217,6 @@ public abstract class OAuthAuthenticator {
             }
         }
         return null;
-    }
-
-    /**
-     * Get suitable implementation of HttpParser.
-     *
-     * @return instance  of HttpParser
-     */
-    protected HttpParser getParser() {
-        return new JsonHttpParser(flow.getJsonFactory());
     }
 
     protected <O> O getJson(String getUserUrl, Class<O> userClass) throws OAuthAuthenticationException {
@@ -290,7 +276,7 @@ public abstract class OAuthAuthenticator {
      * @return <code>true</code> if OAuth token invalidated and <code>false</code> otherwise, e.g. if user does not have
      * token yet
      */
-    public boolean invalidateToken(String userId) {
+    public boolean invalidateToken(String userId) throws IOException {
         Credential credential = flow.loadCredential(userId);
         if (credential != null) {
             flow.getCredentialStore().delete(userId, credential);

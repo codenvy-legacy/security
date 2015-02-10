@@ -28,6 +28,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -187,7 +188,7 @@ public class OAuthAuthenticationService {
 
     @GET
     @Path("invalidate")
-    public Response invalidate(@Context UriInfo uriInfo, @Context SecurityContext security) {
+    public Response invalidate(@Context UriInfo uriInfo, @Context SecurityContext security) throws IOException {
         final Principal principal = security.getUserPrincipal();
         OAuthAuthenticator oauth = getAuthenticator(uriInfo.getQueryParameters().getFirst("oauth_provider"));
         if (principal != null && oauth.invalidateToken(principal.getName())) {
