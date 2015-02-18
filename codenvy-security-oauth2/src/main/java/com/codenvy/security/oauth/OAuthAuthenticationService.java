@@ -197,21 +197,6 @@ public class OAuthAuthenticationService {
                                                                            null)).type(MediaType.TEXT_PLAIN).build();
     }
 
-    @GET
-    @Produces({MediaType.APPLICATION_JSON})
-    @RolesAllowed({"user", "temp_user"})
-    @Path("token")
-    public OAuthToken token(@QueryParam("oauth_provider") String oauth_provider, @Context SecurityContext security)
-            throws Exception {
-        final Principal principal = security.getUserPrincipal();
-        LOG.debug("Get token for oauth_provider='{}'  userId='{}' ", oauth_provider, principal.getName());
-        OAuthAuthenticator provider = providers.getAuthenticator(oauth_provider);
-        if (provider != null) {
-            return provider.getToken(principal.getName());
-        }
-        return null;
-    }
-
     protected OAuthAuthenticator getAuthenticator(String oauthProviderName) {
         OAuthAuthenticator oauth = providers.getAuthenticator(oauthProviderName);
         if (oauth == null) {
