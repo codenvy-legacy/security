@@ -24,6 +24,8 @@
     <packaging>pom</packaging>
     <name>Codenvy Security :: Parent</name>
     <modules>
+        <module>codenvy-security-oauth1</module>
+        <module>codenvy-security-oauth1-bitbucket</module>
         <module>codenvy-security-oauth2</module>
         <module>codenvy-security-oauth2-gwt-client</module>
         <module>codenvy-security-oauth2-google</module>
