@@ -15,11 +15,10 @@ import com.codenvy.security.oauth.shared.User;
 import com.google.api.client.auth.oauth2.AuthorizationCodeFlow;
 import com.google.api.client.auth.oauth2.BearerToken;
 import com.google.api.client.auth.oauth2.ClientParametersAuthentication;
-import com.google.api.client.auth.oauth2.CredentialStore;
-import com.google.api.client.auth.oauth2.MemoryCredentialStore;
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.jackson.JacksonFactory;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.util.store.MemoryDataStoreFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +43,7 @@ public class ProjectLockerOAuthAuthenticator extends OAuthAuthenticator {
                                            @Named("oauth.projectlocker.clientsecret") String clientSecret,
                                            @Named("oauth.projectlocker.redirecturis") String[] redirectUris,
                                            @Named("oauth.projectlocker.authuri") String authUri,
-                                           @Named("oauth.projectlocker.tokenuri") String tokenUri) {
+                                           @Named("oauth.projectlocker.tokenuri") String tokenUri) throws IOException {
         super(new AuthorizationCodeFlow.Builder(
                       BearerToken.authorizationHeaderAccessMethod(),
                       new NetHttpTransport(),
@@ -57,7 +56,7 @@ public class ProjectLockerOAuthAuthenticator extends OAuthAuthenticator {
                       authUri
               )
                       .setScopes(Collections.<String>emptyList())
-                      .setCredentialStore(new MemoryCredentialStore())
+                      .setDataStoreFactory(new MemoryDataStoreFactory())
                       .build(),
               Arrays.asList(redirectUris)
              );

@@ -14,8 +14,7 @@ import com.codenvy.api.auth.shared.dto.OAuthToken;
 import com.codenvy.commons.json.JsonHelper;
 import com.codenvy.commons.json.JsonParseException;
 import com.codenvy.security.oauth.shared.User;
-import com.google.api.client.auth.oauth2.CredentialStore;
-import com.google.api.client.auth.oauth2.MemoryCredentialStore;
+import com.google.api.client.util.store.MemoryDataStoreFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -38,8 +37,8 @@ public class GitHubOAuthAuthenticator extends OAuthAuthenticator {
                                     @Named("oauth.github.clientsecret") String clientSecret,
                                     @Named("oauth.github.redirecturis") String[] redirectUris,
                                     @Named("oauth.github.authuri") String authUri,
-                                    @Named("oauth.github.tokenuri") String tokenUri) {
-        super(clientId, clientSecret, redirectUris, authUri, tokenUri, new MemoryCredentialStore());
+                                    @Named("oauth.github.tokenuri") String tokenUri) throws IOException {
+        super(clientId, clientSecret, redirectUris, authUri, tokenUri, new MemoryDataStoreFactory());
     }
 
     @Override

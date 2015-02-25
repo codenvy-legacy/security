@@ -15,12 +15,11 @@ import com.codenvy.commons.json.JsonHelper;
 import com.codenvy.commons.json.JsonParseException;
 import com.codenvy.commons.lang.IoUtil;
 import com.codenvy.security.oauth.shared.User;
-import com.google.api.client.auth.oauth2.CredentialStore;
-import com.google.api.client.auth.oauth2.MemoryCredentialStore;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.jackson.JacksonFactory;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.util.store.MemoryDataStoreFactory;
 
 import org.everrest.core.impl.provider.json.JsonValue;
 import org.slf4j.Logger;
@@ -35,7 +34,6 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.Collections;
 
 /** OAuth authentication for google account. */
 @Singleton
@@ -48,7 +46,7 @@ public class GoogleOAuthAuthenticator extends OAuthAuthenticator {
                                     @Named("oauth.google.clientsecret") String clientSecret,
                                     @Named("oauth.google.redirecturis") String[] redirectUris,
                                     @Nullable @Named("oauth.google.authuri") String authUri,
-                                    @Nullable @Named("oauth.google.tokenuri") String tokenUri) {
+                                    @Nullable @Named("oauth.google.tokenuri") String tokenUri) throws IOException {
         super(new GoogleAuthorizationCodeFlow.Builder(
                       new NetHttpTransport(),
                       new JacksonFactory(),
@@ -60,9 +58,11 @@ public class GoogleOAuthAuthenticator extends OAuthAuthenticator {
                                       .setAuthUri(authUri)
                                       .setTokenUri(tokenUri)
                                                       ),
-                      Collections.<String>emptyList()
+                      Arrays.asList(
+                              "https://www.googleapis.com/auth/userinfo.email",
+                              "https://www.googleapis.com/auth/userinfo.profile")
               )
-                      .setCredentialStore(new MemoryCredentialStore())
+                      .setDataStoreFactory(new MemoryDataStoreFactory())
                       .setApprovalPrompt("auto")
                       .setAccessType("online").build(),
               Arrays.asList(redirectUris)
