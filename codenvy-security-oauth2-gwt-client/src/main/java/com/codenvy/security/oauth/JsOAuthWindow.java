@@ -63,7 +63,6 @@ public class JsOAuthWindow {
             var popup_close_handler = function () {
                 if (!popupWindow || popupWindow.closed) {
                     instance.@com.codenvy.security.oauth.JsOAuthWindow::setAuthenticationStatus(I)(1);
-                    console.log("OAuth: login not permitted.");
                     popupWindow = null;
                     if (popupCloseHandlerIntervalId) {
                         window.clearInterval(popupCloseHandlerIntervalId);
@@ -76,20 +75,16 @@ public class JsOAuthWindow {
                     }
 
                     if (href) {
-                        console.log(href);
                         var path = popupWindow.location.pathname;
-                        console.log("path" + path + " :: " + "/ws/" + $wnd.wsName);
                         if (path == ("/ws/" + $wnd.IDE.config.workspaceName) || path == "/dashboard/") {
                             instance.@com.codenvy.security.oauth.JsOAuthWindow::setAuthenticationStatus(I)(3);
                             popupWindow.close();
                             popupWindow = null;
                             if (popupCloseHandlerIntervalId) {
                                 window.clearInterval(popupCloseHandlerIntervalId);
-                                console.log("OAuth: authentication successful: " + popupCloseHandlerIntervalId + ".");
                             }
                         } else if (path.match("j_security_check$")) {
                             instance.@com.codenvy.security.oauth.JsOAuthWindow::setAuthenticationStatus(I)(2);
-                            console.log("OAuth: authentication failed.");
                             if (!errorFlag) {
                                 errorFlag = true;
                                 popupWindow.location.replace(errorPageUrl);
